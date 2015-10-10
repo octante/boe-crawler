@@ -3,6 +3,14 @@ var when = require('when');
 var http = require('http');
 var parseString = require('xml2js').parseString;
 
+function getMetadataValue(data, field) {
+    if (data[field] != undefined) {
+        return data[field][0];
+    }
+
+    return '';
+}
+
 amqp.connect('amqp://localhost').then(function(conn) {
 
     process.once('SIGINT', function() { conn.close(); });
@@ -19,10 +27,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
             ch.consume(itemsQueue, function(msg) {
                 var boe_item = JSON.parse(msg.content.toString());
 
-                // Download page and save content to another rabbit queue
-                //var url = "http://boe.es" + boe_item['urlXml'];
-
-                var url = "http://boe.es/diario_boe/xml.php?id=BOE-A-2015-9550";
+                var url = "http://boe.es" + boe_item['urlXml'];
 
                 http.get(url, function(response) {
                     if (response.statusCode == '200') {
@@ -30,27 +35,33 @@ amqp.connect('amqp://localhost').then(function(conn) {
                         // Get data
                         var boeData = '';
                         response.on('data', function (chunk) {
-
                             boeData += chunk.toString();
                         });
 
                         response.on('end', function(){
+
+                            boe_item['text'] = boeData.substring(
+                                boeData.indexOf('<p class="parrafo">'),
+                                boeData.indexOf('</documento>')
+                            ).replace('</texto>', '');
+
                             parseString(boeData, function (err, result) {
                                 var parsedData = result;
 
                                 var metadata = parsedData['documento']['metadatos'][0];
 
+                                console.log(url);
+
                                 boe_item['parsed_at'] = new Date().toISOString();
                                 boe_item['department']['code'] = metadata['departamento'][0]['$']['codigo'];
-                                boe_item['id'] = metadata['identificador'][0];
-                                boe_item['diary_num'] = metadata['diario_numero'][0];
-                                boe_item['section'] = metadata['seccion'][0];
-                                boe_item['subsection'] = metadata['subseccion'][0];
-                                boe_item['oficial_number'] = metadata['numero_oficial'][0];
 
-                                if (metadata['numero_anuncio'] != undefined) {
-                                    boe_item['ad_num'] = metadata['numero_anuncio'][0];
-                                }
+                                boe_item['id'] = getMetadataValue(metadata, 'identificador');
+                                boe_item['diary_num'] = getMetadataValue(metadata, 'diario_numero');
+
+                                boe_item['section'] = getMetadataValue(metadata, 'seccion');
+                                boe_item['subsection'] = getMetadataValue(metadata, 'subseccion');
+                                boe_item['oficial_number'] = getMetadataValue(metadata, 'numero_oficial');
+                                boe_item['ad_num'] = getMetadataValue(metadata, 'numero_anuncio');
 
                                 if (metadata['rango'] != undefined) {
                                     boe_item['range'] = {
@@ -59,44 +70,44 @@ amqp.connect('amqp://localhost').then(function(conn) {
                                     };
                                 }
 
-                                boe_item['image_letter'] = metadata['letra_imagen'][0];
-                                boe_item['initial_page'] = metadata['pagina_inicial'][0];
-                                boe_item['end_page'] = metadata['pagina_final'][0];
+                                boe_item['image_letter'] = getMetadataValue(metadata, 'letra_imagen');
+                                boe_item['initial_page'] = getMetadataValue(metadata, 'pagina_inicial');
+                                boe_item['end_page'] = getMetadataValue(metadata, 'pagina_final');
 
-                                boe_item['disposition_date'] = metadata['fecha_disposicion'][0];
-                                boe_item['publication_date'] = metadata['fecha_publicacion'][0];
-                                boe_item['vigency_date'] = metadata['fecha_vigencia'][0];
-                                boe_item['abolition_date'] = metadata['fecha_derogacion'][0];
+                                boe_item['disposition_date'] = getMetadataValue(metadata, 'fecha_disposicion');
+                                boe_item['publication_date'] = getMetadataValue(metadata, 'fecha_publicacion');
+                                boe_item['vigency_date'] = getMetadataValue(metadata, 'fecha_vigencia');
+                                boe_item['abolition_date'] = getMetadataValue(metadata, 'fecha_derogacion');
+                                boe_item['suplement_image_letter'] = getMetadataValue(metadata, 'suplemento_letra_imagen');
+                                boe_item['suplement_initial_page'] = getMetadataValue(metadata, 'suplement_initial_page');
+                                boe_item['suplement_final_page'] = getMetadataValue(metadata, 'suplemento_pagina_final');
+                                boe_item['legislative_status'] = getMetadataValue(metadata, 'estatus_legislativo');
 
-                                boe_item['suplement_image_letter'] = metadata['suplemento_letra_imagen'][0];
-                                boe_item['suplement_initial_page'] = metadata['suplemento_pagina_inicial'][0];
-                                boe_item['suplement_final_page'] = metadata['suplemento_pagina_final'][0];
+                                if (metadata['origen_legislativo'] != undefined) {
+                                    boe_item['legislative_origin'] = {
+                                        'code': metadata['origen_legislativo'][0]['$']['codigo'],
+                                        'name': metadata['origen_legislativo'][0]['_']
+                                    };
+                                }
 
-                                boe_item['legislative_status'] = metadata['estatus_legislativo'][0];
-                                boe_item['legislative_origin'] = {
-                                    'code': metadata['origen_legislativo'][0]['$']['codigo'],
-                                    'name': metadata['origen_legislativo'][0]['_']
-                                };
+                                if (metadata['estado_consolidacion'] != undefined) {
+                                    boe_item['consolidation_status'] = {
+                                        'code': metadata['estado_consolidacion'][0]['$']['codigo'],
+                                        'name': metadata['estado_consolidacion'][0]['_']
+                                    };
+                                }
 
-                                boe_item['consolidation_status'] = {
-                                    'code': metadata['estado_consolidacion'][0]['$']['codigo'],
-                                    'name': metadata['estado_consolidacion'][0]['_']
-                                };
-
-                                boe_item['judicially_annulled'] = metadata['judicialmente_anulada'][0];
-                                boe_item['exhausted_force'] = metadata['vigencia_agotada'][0];
-                                boe_item['abolition_status'] = metadata['estatus_derogacion'][0];
-
-                                boe_item['url_epub'] = metadata['url_epub'][0];
-                                boe_item['url_pdf'] = metadata['url_pdf'][0];
+                                boe_item['judicially_annulled'] = getMetadataValue(metadata, 'judicialmente_anulada');
+                                boe_item['exhausted_force'] = getMetadataValue(metadata, 'vigencia_agotada');
+                                boe_item['abolition_status'] = getMetadataValue(metadata, 'estatus_derogacion');
+                                boe_item['url_epub'] = getMetadataValue(metadata, 'url_epub');
+                                boe_item['url_pdf'] = getMetadataValue(metadata, 'url_pdf');
 
                                 // Is not saved correctly
-                                boe_item['url_pdf_catalan'] = metadata['url_pdf_catalan'][0];
-                                boe_item['url_pdf_euskera'] = metadata['url_pdf_euskera'][0];
-                                boe_item['url_pdf_catalan'] = metadata['url_pdf_gallego'][0];
-                                boe_item['url_pdf_valenciano'] = metadata['url_pdf_valenciano'][0];
-
-                                boe_item['text'] = parsedData['documento']['texto'][0];
+                                boe_item['url_pdf_catalan'] = getMetadataValue(metadata, 'url_pdf_catalan');
+                                boe_item['url_pdf_euskera'] = getMetadataValue(metadata, 'url_pdf_euskera');
+                                boe_item['url_pdf_gallego'] = getMetadataValue(metadata, 'url_pdf_gallego');
+                                boe_item['url_pdf_valenciano'] = getMetadataValue(metadata, 'url_pdf_valenciano');
 
                                 var analysis = parsedData['documento']['analisis'][0];
 
