@@ -1,26 +1,10 @@
-var nats = require('nats').connect();
+var should = require('should');
 
-// Simple Publisher
-nats.publish('foo', 'Hello World!');
-
-// Simple Subscriber
-nats.subscribe('foo', function(msg) {
-    console.log('Received a message: ' + msg);
+describe('Array', function() {
+    describe('#indexOf()', function () {
+        it('should return -1 when the value is not present', function () {
+            ([1,2,3].indexOf(5)).should.be.exactly(-1);
+            ([1,2,3].indexOf(0)).should.be.exactly(-1);
+        });
+    });
 });
-
-// Unsubscribing
-var sid = nats.subscribe('foo', function(msg) {});
-nats.unsubscribe(sid);
-
-// Requests
-nats.request('help', function(response) {
-    console.log('Got a response for help: ' + response);
-});
-
-// Replies
-nats.subscribe('help', function(request, replyTo) {
-    nats.publish(replyTo, 'I can help!');
-});
-
-// Close connection
-nats.close();

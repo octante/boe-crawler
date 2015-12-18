@@ -1,0 +1,190 @@
+{
+  "$": {
+    "fecha_actualizacion": "20150901082601"
+  },
+  "documento": {
+    "metadatos": [
+      {
+        "identificador": ["BOE-A-2015-9498"],
+        "titulo": ["Orden de 28 de julio de 2015, por la que se destina a los Jueces que se relacionan, como consecuencia del concurso resuelto por Acuerdo de la Comisi�n Permanente del Consejo General del Poder Judicial."],
+        "diario": [
+          {
+            "_": "Boletín Oficial del Estado",
+            "$": {
+              "codigo": "BOE"
+            }
+          }
+        ],
+        "diario_numero": ["209"],
+        "seccion": ["2"],
+        "subseccion": ["A"],
+        "departamento": [
+          {
+            "_": "Consejo General del Poder Judicial",
+            "$": {
+              "codigo": "1820"
+            }
+          }
+        ],
+        "rango": [
+          {
+            "_": "Orden",
+            "$": {
+              "codigo": "1350"
+            }
+          }
+        ],
+        "numero_anuncio": ["10"],
+        "numero_oficial": ["1"],
+        "fecha_disposicion": ["20150728"],
+        "fecha_publicacion": ["20150901"],
+        "fecha_vigencia": ["20150902"],
+        "fecha_derogacion": ["20150903"],
+        "letra_imagen": ["A"],
+        "pagina_inicial": ["77479"],
+        "pagina_final": ["77488"],
+        "suplemento_letra_imagen": ["A"],
+        "suplemento_pagina_inicial": ["1"],
+        "suplemento_pagina_final": ["2"],
+        "estatus_legislativo": ["S"],
+        "origen_legislativo": [
+          {
+            "_": "Estatal",
+            "$": {
+              "codigo": "1"
+            }
+          }
+        ],
+        "estado_consolidacion": [
+          {
+            "_": "Nombre estado consolidación",
+            "$": {
+              "codigo": "1"
+            }
+          }
+        ],
+        "judicialmente_anulada": ["N"],
+        "vigencia_agotada": ["N"],
+        "estatus_derogacion": ["N"],
+        "url_epub": ["/boe/dias/2015/09/01/pdfs/BOE-A-2015-9498.pub"],
+        "url_pdf": ["/boe/dias/2015/09/01/pdfs/BOE-A-2015-9498.pdf"],
+        "url_pdf_catalan": ["url_pdf_catalan"],
+        "url_pdf_euskera": ["url_pdf_euskera"],
+        "url_pdf_gallego": ["url_pdf_gallego"],
+        "url_pdf_valenciano": ["url_pdf_valenciano"]
+      }
+    ],
+    "analisis": [
+      {
+        "notas": [
+          {
+            "nota": [
+              {
+                "_": "Entrada en vigor el 3 de febrero de 2015.",
+                "$": {
+                  "codigo": "10",
+                  "orden": "200"
+                }
+              }
+            ]
+          }
+        ],
+        "materias": [
+          {
+            "materia": [
+              {
+                "_": "Expendedurías de Tabaco y Efectos Timbrados",
+                "$": {
+                  "codigo": "3511",
+                  "orden": "1"
+                }
+              },
+              {
+                "_": "Precios",
+                "$": {
+                  "codigo": "5665",
+                  "orden": "2"
+                }
+              },
+              {
+                "_": "Tabaco",
+                "$": {
+                  "codigo": "6819",
+                  "orden": "3"
+                }
+              }
+            ]
+          }
+        ],
+        "alertas": [
+          {
+            "alerta": [
+              {
+                "_": "Concursos de personal público",
+                "$": {
+                  "codigo": "141",
+                  "orden": "1"
+                }
+              }
+            ]
+          }
+        ],
+        "referencias": [
+          {
+            "anteriores": [
+              {
+                "anterior": [
+                  {
+                    "$": {
+                      "referencia": "BOE-A-1998-10407",
+                      "orden": "3060"
+                    },
+                    "palabra": [
+                      {
+                        "_": "DE CONFORMIDAD con",
+                        "$": {
+                          "codigo": "440"
+                        }
+                      }
+                    ] ,
+                    "texto": [
+                      "el art. 4 de la Ley 13/1998, de 4 de mayo"
+                    ]
+                  }
+                ]
+              }
+            ] ,
+            "posteriores": [
+              {
+                "posterior": [
+                  {
+                    "$": {
+                      "referencia": "BOE-A-1998-10406",
+                      "orden": "3061"
+                    },
+                    "palabra": [
+                      {
+                        "_": "DE CONFORMIDAD con",
+                        "$": {
+                          "codigo": "441"
+                        }
+                      }
+                    ],
+                    "texto": [
+                      "el art. 4 de la Ley 13/1998, de 5 de mayo"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "texto": [
+      {
+        "p": "[Object]"
+      }
+    ]
+  }
+}

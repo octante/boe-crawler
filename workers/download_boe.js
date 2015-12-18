@@ -1,8 +1,7 @@
-// http://boe.es/diario_boe/xml.php?id=BOE-S-20150903
-
 var amqp = require('amqplib');
 var when = require('when');
 var http = require('http');
+var sleep = require('sleep');
 
 amqp.connect('amqp://localhost').then(function(conn) {
 
@@ -10,7 +9,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
 
     return when(conn.createChannel().then(function(ch) {
 
-        var urlsQueue = 'boe.urls';
+        var urlsQueue = 'boe_crawler.boe_urls';
         var ok = ch.assertQueue(
             urlsQueue,
             {durable: true}
@@ -29,17 +28,17 @@ amqp.connect('amqp://localhost').then(function(conn) {
                         // Get data
                         var boeData = '';
                         response.on('data', function (chunk) {
-
                             boeData += chunk.toString();
                         });
 
                         response.on('end', function(){
+
                             // Send downloaded data to content queue
                             amqp.connect('amqp://localhost').then(function (conn) {
                                 return when(conn.createChannel().then(function (ch) {
 
                                     // Send data to the queue
-                                    var contentQueue = 'boe.content';
+                                    var contentQueue = 'boe_crawler.boes';
                                     var ok = ch.assertQueue(
                                         contentQueue,
                                         {durable: true}
@@ -59,6 +58,10 @@ amqp.connect('amqp://localhost').then(function(conn) {
                         // Do something
                     }
                 });
+
+                // Sleep 1 second
+                sleep.sleep(1);
+
             }, {noAck: false});
         });
     }));
