@@ -39,6 +39,8 @@ amqp.connect('amqp://localhost').then(function(conn) {
 
                                     ch.sendToQueue(parsedItemQueue, new Buffer(JSON.stringify(contentDocument)));
                                     console.log("Sent downloaded item: " + document['urlXml']);
+
+                                    sleep.sleep(15);
                                 });
                             }));
                         });
@@ -48,7 +50,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
                     console.log('An error occurred downloading boe item: ' + document['urlXml'] + "[" + err + "]");
                 }
 
-            }, {noAck: false});
+            }, {noAck: true});
         });
     }));
 });

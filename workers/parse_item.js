@@ -3,8 +3,6 @@ var when = require('when');
 var parseString = require('xml2js').parseString;
 var parse_item = require("../modules/parse_item");
 
-// @todo Parse html content
-
 amqp.connect('amqp://localhost').then(function(conn) {
 
     process.once('SIGINT', function() { conn.close(); });
@@ -17,7 +15,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
             {durable: true}
         );
 
-        ok.then(function(_qok) {
+        ok.then(function() {
             ch.consume(itemsQueue, function(msg) {
                 var boe_item = msg.content.toString();
 
@@ -60,7 +58,6 @@ amqp.connect('amqp://localhost').then(function(conn) {
                         amqp.connect('amqp://localhost').then(function (conn) {
                             return when(conn.createChannel().then(function (ch) {
 
-                                // Send data to the queue
                                 var parsedItemQueue = 'boe_crawler.boe_parsed_items';
                                 var ok = ch.assertQueue(
                                     parsedItemQueue,
@@ -68,7 +65,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
                                 );
 
                                 console.log(boe_item_data);
-                                ok.then(function (_qok) {
+                                ok.then(function () {
                                     ch.sendToQueue(parsedItemQueue, new Buffer(JSON.stringify(boe_item_data)));
                                     console.log("Sent parsed item: " + boe_item_data['id']);
                                 });
@@ -78,7 +75,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
                         console.log('An error occurred when parsing boe_item: "' + err + '"');
                     }
                 });
-            }, {noAck: false});
+            }, {noAck: true});
         });
     }));
 });

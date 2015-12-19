@@ -38,18 +38,18 @@ amqp.connect('amqp://localhost').then(function(conn) {
                                     };
                                     ch.sendToQueue(contentQueue, new Buffer(JSON.stringify(contentDocument)));
                                     console.log("Sent message: " + document['url']);
+
+                                    sleep.sleep(15);
                                 });
                             }));
                         });
                     });
 
-                    sleep.sleep(15);
-
                 } catch (err) {
                     console.log('An error occurred downloading boe: ' + document['url'] + "[err]");
                 }
 
-            }, {noAck: false});
+            }, {noAck: true});
         });
     }));
 });

@@ -28,7 +28,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
                     console.log('An error occurred when inserting boe item: "' + err + '"');
                 }
 
-            }, {noAck: false});
+            }, {noAck: true});
         });
     }));
 });

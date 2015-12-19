@@ -16,7 +16,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
             {durable: true}
         );
 
-        ok.then(function(_qok) {
+        ok.then(function() {
             ch.consume(contentQueue, function(msg) {
                 var boe_diary = msg.content.toString();
 
@@ -36,7 +36,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
                                     itemsQueue,
                                     {durable: true}
                                 );
-                                ok.then(function (_qok) {
+                                ok.then(function() {
                                    ch.sendToQueue(itemsQueue, new Buffer(JSON.stringify(item)));
                                    console.log("Sent item: " + item['id']);
                                 });
@@ -53,7 +53,6 @@ amqp.connect('amqp://localhost').then(function(conn) {
                     amqp.connect('amqp://localhost').then(function (conn) {
                         return when(conn.createChannel().then(function (ch) {
 
-                            // Send data to the queue
                             var urlsQueue = 'boe_crawler.boe_urls';
                             var ok = ch.assertQueue(
                                 urlsQueue,
@@ -71,7 +70,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
                         }));
                     });
                 });
-            }, {noAck: false});
+            }, {noAck: true});
         });
     }));
 });
