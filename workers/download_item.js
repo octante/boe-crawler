@@ -14,7 +14,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
             {durable: true}
         );
 
-        ok.then(function(_qok) {
+        ok.then(function() {
             ch.consume(itemsQueue, function(msg) {
                 var document = JSON.parse(msg.content.toString());
 

@@ -30,7 +30,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
                         return when(conn.createChannel().then(function (ch) {
 
                             items.forEach(function(item){
-                                // Send data to the queue
+
                                 var itemsQueue = 'boe_crawler.boe_items_urls';
                                 var ok = ch.assertQueue(
                                     itemsQueue,
@@ -63,7 +63,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
                                 'created_at': new Date().toISOString(),
                                 'url': url
                             };
-                            ok.then(function (_qok) {
+                            ok.then(function () {
                                 ch.sendToQueue(urlsQueue, new Buffer(JSON.stringify(urlData)));
                                 console.log("Sent BOE url: " + urlData['url']);
                             });
