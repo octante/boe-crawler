@@ -1,6 +1,6 @@
 var amqp = require('amqplib');
 var when = require('when');
-var http = require('http');
+var http = require('../lib/http');
 var sleep = require('sleep');
 
 amqp.connect('amqp://localhost').then(function(conn) {
@@ -22,45 +22,35 @@ amqp.connect('amqp://localhost').then(function(conn) {
                 // Download page and save content to another rabbit queue
                 var document = JSON.parse(boe_link);
 
-                http.get(document['url'], function(response) {
-                    if (response.statusCode == '200') {
+                try {
+                    http.get(document['url'], function (boeData) {
+                        amqp.connect('amqp://localhost').then(function (conn) {
+                            return when(conn.createChannel().then(function (ch) {
 
-                        // Get data
-                        var boeData = '';
-                        response.on('data', function (chunk) {
-                            boeData += chunk.toString();
+                                // Send data to the queue
+                                var contentQueue = 'boe_crawler.boes';
+                                var ok = ch.assertQueue(
+                                    contentQueue,
+                                    {durable: true}
+                                );
+                                ok.then(function (_qok) {
+                                    var contentDocument = {
+                                        'created_at': new Date().toISOString(),
+                                        'data': boeData
+                                    };
+                                    ch.sendToQueue(contentQueue, new Buffer(JSON.stringify(contentDocument)));
+                                    console.log("Sent message: " + document['url']);
+                                });
+                            }));
                         });
+                    });
 
-                        response.on('end', function(){
+                    // Sleep 1 second
+                    sleep.sleep(5);
 
-                            // Send downloaded data to content queue
-                            amqp.connect('amqp://localhost').then(function (conn) {
-                                return when(conn.createChannel().then(function (ch) {
-
-                                    // Send data to the queue
-                                    var contentQueue = 'boe_crawler.boes';
-                                    var ok = ch.assertQueue(
-                                        contentQueue,
-                                        {durable: true}
-                                    );
-                                    ok.then(function (_qok) {
-                                        var contentDocument = {
-                                            'created_at': new Date().toISOString(),
-                                            'data': boeData
-                                        };
-                                        ch.sendToQueue(contentQueue, new Buffer(JSON.stringify(contentDocument)));
-                                        console.log("Sent message: " + document['url']);
-                                    });
-                                }));
-                            });
-                        });
-                    } else {
-                        // Do something
-                    }
-                });
-
-                // Sleep 1 second
-                sleep.sleep(1);
+                } catch (err) {
+                    console.log('An error occurred downloading boe: ' + document['url'] + "[err]");
+                }
 
             }, {noAck: false});
         });
