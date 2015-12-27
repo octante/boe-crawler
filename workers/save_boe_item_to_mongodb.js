@@ -25,7 +25,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
                         console.log('Inserted item: ' + boe_item['id']);
                     });
                 } catch (err) {
-                    console.log('An error occurred when inserting boe item: "' + err + '"');
+                    console.log('An error occurred when inserting boe item (' + boe_item['id'] + '): [' + err + ']');
                 }
 
             }, {noAck: true});

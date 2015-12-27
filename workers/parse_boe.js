@@ -23,7 +23,11 @@ amqp.connect('amqp://localhost').then(function(conn) {
                 parseString(JSON.parse(boe_diary)['data'], function (err, result) {
                     var parsedData = result;
 
-                    var items = boe_parser.parse(parsedData);
+                    try {
+                        var items = boe_parser.parse(parsedData);
+                    } catch (err) {
+                        console.log("Error parsing boe [" + err + "]");
+                    }
 
                     // Send downloaded data to content queue
                     amqp.connect('amqp://localhost').then(function (conn) {
@@ -31,15 +35,19 @@ amqp.connect('amqp://localhost').then(function(conn) {
 
                             items.forEach(function(item){
 
-                                var itemsQueue = 'boe_crawler.boe_items_urls';
-                                var ok = ch.assertQueue(
-                                    itemsQueue,
-                                    {durable: true}
-                                );
-                                ok.then(function() {
-                                   ch.sendToQueue(itemsQueue, new Buffer(JSON.stringify(item)));
-                                   console.log("Sent item: " + item['id']);
-                                });
+                                try {
+                                    var itemsQueue = 'boe_crawler.boe_items_urls';
+                                    var ok = ch.assertQueue(
+                                        itemsQueue,
+                                        {durable: true}
+                                    );
+                                    ok.then(function () {
+                                        ch.sendToQueue(itemsQueue, new Buffer(JSON.stringify(item)));
+                                        console.log("Sent item: " + item['id']);
+                                    });
+                                } catch (err) {
+                                    console.log('Error occurred sending boe_item (' + item['id'] + ')url [' + err + ']');
+                                }
                             });
                         }));
                     });
@@ -63,10 +71,15 @@ amqp.connect('amqp://localhost').then(function(conn) {
                                 'created_at': new Date().toISOString(),
                                 'url': url
                             };
-                            ok.then(function () {
-                                ch.sendToQueue(urlsQueue, new Buffer(JSON.stringify(urlData)));
-                                console.log("Sent BOE url: " + urlData['url']);
-                            });
+
+                            try {
+                                ok.then(function () {
+                                    ch.sendToQueue(urlsQueue, new Buffer(JSON.stringify(urlData)));
+                                    console.log("Sent BOE url: " + urlData['url']);
+                                });
+                            } catch (err) {
+                                console.log('Error occurred sending next boe url  (' + urlData['url'] + ')[' + err + ']');
+                            }
                         }));
                     });
                 });

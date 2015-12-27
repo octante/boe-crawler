@@ -64,7 +64,6 @@ amqp.connect('amqp://localhost').then(function(conn) {
                                     {durable: true}
                                 );
 
-                                console.log(boe_item_data);
                                 ok.then(function () {
                                     ch.sendToQueue(parsedItemQueue, new Buffer(JSON.stringify(boe_item_data)));
                                     console.log("Sent parsed item: " + boe_item_data['id']);
@@ -72,7 +71,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
                             }));
                         });
                     } catch (err) {
-                        console.log('An error occurred when parsing boe_item: "' + err + '"');
+                        console.log('An error occurred when parsing boe_item (' + boe_item_data['id'] + '): "' + err + '"');
                     }
                 });
             }, {noAck: true});

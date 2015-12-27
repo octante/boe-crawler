@@ -15,7 +15,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
             {durable: true}
         );
 
-        ok.then(function(_qok) {
+        ok.then(function() {
             ch.consume(urlsQueue, function(msg) {
 
                 var document = JSON.parse(msg.content.toString());
@@ -31,7 +31,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
                                     {durable: true}
                                 );
 
-                                ok.then(function (_qok) {
+                                ok.then(function () {
                                     var contentDocument = {
                                         'created_at': new Date().toISOString(),
                                         'data': boeData
@@ -46,7 +46,7 @@ amqp.connect('amqp://localhost').then(function(conn) {
                     });
 
                 } catch (err) {
-                    console.log('An error occurred downloading boe: ' + document['url'] + "[err]");
+                    console.log('An error occurred downloading boe: ' + document['url'] + "[" + err + "]");
                 }
 
             }, {noAck: true});
