@@ -38,8 +38,6 @@ amqp.connect('amqp://localhost').then(function(conn) {
                                     };
                                     ch.sendToQueue(contentQueue, new Buffer(JSON.stringify(contentDocument)));
                                     console.log("Sent message: " + document['url']);
-
-                                    sleep.sleep(15);
                                 });
                             }));
                         });
