@@ -12,7 +12,8 @@
     "node-gyp": "^3.2.1",
     "string": "^3.3.1",
     "when": "^3.7.7",
-    "xml2js": "^0.4.15"
+    "xml2js": "^0.4.15",
+    "sleep": "https://github.com/octante/node-sleep/tarball/dc363292d549667e815065f99b8c8d65f0b5a455"
   },
   "devDependencies": {
     "should": "^8.0.2",
