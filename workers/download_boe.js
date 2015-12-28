@@ -1,7 +1,7 @@
 var amqp = require('amqplib');
 var when = require('when');
 var http = require('../lib/http');
-var sleep = require('sleep');
+var sleep = require('thread-sleep');
 
 amqp.connect('amqp://localhost').then(function(conn) {
 
@@ -38,6 +38,8 @@ amqp.connect('amqp://localhost').then(function(conn) {
                                     };
                                     ch.sendToQueue(contentQueue, new Buffer(JSON.stringify(contentDocument)));
                                     console.log("Sent message: " + document['url']);
+
+                                    sleep(1000)
                                 });
                             }));
                         });
